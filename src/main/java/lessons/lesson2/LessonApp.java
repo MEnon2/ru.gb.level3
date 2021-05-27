@@ -10,8 +10,6 @@ public class LessonApp {
 
         authService = new BaseAuthService();
         authService.start();
-
-//        authService.in
         authService.stop();
     }
 
