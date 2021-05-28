@@ -10,6 +10,7 @@ public class BaseAuthService implements AuthService {
     static final String DATABASE_URL = "jdbc:sqlite:javadb.db";
     static Connection connection;
     static Statement statement;
+    static final String TABLE_NAME = "chatUsers";
 
     static {
         try {
@@ -28,7 +29,11 @@ public class BaseAuthService implements AuthService {
 
         System.out.println("Auth start");
         createTable();
+        selectUsers();
 
+        for (int i = 0; i < 10; i++) {
+            createUser("login" + i, "pass" + i, "nick" + i);
+        }
     }
 
     @Override
@@ -36,40 +41,12 @@ public class BaseAuthService implements AuthService {
         System.out.println("Auth stop");
     }
 
+
     @Override
-    public boolean createUser(String login, String pass, String nick) throws SQLException {
-        Optional<Entry> foundUser = selectUserFromLoginAndPass(login, pass);
-        if (!foundUser.isPresent()) {
-            insertUser(login, pass, nick);
-            System.out.println("User <" + nick + "> added successfully");
-
-            foundUser = selectUserFromLoginAndPass(login, pass);
-            if (foundUser.isPresent()) {
-                entries.add(foundUser.get());
-            } else {
-                return false;
-            }
-
-        } else {
-            System.out.println("User <" + nick + "> is already created");
-            return false;
-        }
-
+    public boolean updateUserInfo(String login, String pass, String field, String newValue) {
         return true;
     }
 
-    @Override
-    public boolean removeUser(String login, String pass) {
-        return false;
-    }
-
-    @Override
-    public Optional<String> getNickFromLoginAndPass(String login, String pass) {
-        if (login.isEmpty() || pass.isEmpty()) {
-            return Optional.empty();
-        }
-        return entries.stream().filter(e -> e.login.equals(login)).filter(e -> e.pass.equals(pass)).map(e -> e.nick).findFirst();
-    }
 
     private class Entry {
         private final String login;
@@ -86,49 +63,127 @@ public class BaseAuthService implements AuthService {
     private List<Entry> entries = new ArrayList<>();
 
     public BaseAuthService() throws SQLException {
-        selectUsers();
-        for (int i = 0; i < 10; i++) {
-            createUser("login" + i, "pass" + i, "nick" + i);
-        }
-
 
     }
 
+
+    //создание таблицы
     private void createTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS chatUsers" +
+        if (createTableSQL()) {
+            System.out.println("Table <" + TABLE_NAME + "> created");
+        }
+    }
+
+    private boolean createTableSQL() throws SQLException {
+        String QuerySQL = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
                 "(" +
                 "userId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 "login TEXT NOT NULL UNIQUE," +
                 "pass TEXT NOT NULL," +
                 "nick TEXT NOT NULL" +
                 ")";
-        statement.execute(createTableSQL);
-
+        return statement.execute(QuerySQL);
     }
 
-    private void insertUser(String login, String pass, String nick) throws SQLException {
-        String createTableSQL = "INSERT INTO chatUsers (login, pass, nick) VALUES ('" + login + "', '" + pass + "', '" + nick + "')";
-        statement.execute(createTableSQL);
-    }
-
-    private Optional<Entry> selectUserFromLoginAndPass(String login, String pass) throws SQLException {
-        Optional<Entry> foundUser = Optional.empty();
-        String createTableSQL = "SELECT * FROM chatUsers WHERE login = '" + login + "' AND pass = '" + pass + "'";
-        ResultSet rs = statement.executeQuery(createTableSQL);
-        if (rs.next()) {
-            foundUser = Optional.of(new Entry(rs.getString("login"), rs.getString("pass"), rs.getString("nick")));
-        }
-        return foundUser;
-    }
-
+    //выборка пользователей
     private void selectUsers() throws SQLException {
-        String createTableSQL = "SELECT * FROM chatUsers";
-        ResultSet rs = statement.executeQuery(createTableSQL);
+        ResultSet rs = selectUsersSQL();
 
         while (rs.next()) {
             entries.add(new Entry(rs.getString("login"), rs.getString("pass"), rs.getString("nick")));
         }
     }
 
+    private ResultSet selectUsersSQL() throws SQLException {
+        String QuerySQL = "SELECT * FROM " + TABLE_NAME;
+        return statement.executeQuery(QuerySQL);
+    }
+
+    //получение пользователя
+    private Optional<Entry> selectUser(String login, String pass) throws SQLException {
+        Optional<Entry> foundUser = Optional.empty();
+
+        ResultSet rs = selectUserSQL(login, pass);
+        if (rs.next()) {
+            foundUser = Optional.of(new Entry(rs.getString("login"), rs.getString("pass"), rs.getString("nick")));
+        }
+        return foundUser;
+    }
+
+    private ResultSet selectUserSQL(String login, String pass) throws SQLException {
+        String QuerySQL = "SELECT * FROM " + TABLE_NAME + " WHERE login = '" + login + "' AND pass = '" + pass + "'";
+        return statement.executeQuery(QuerySQL);
+    }
+
+
+    @Override
+    public Optional<String> getUserNick(String login, String pass) {
+        if (login.isEmpty() || pass.isEmpty()) {
+            return Optional.empty();
+        }
+        return entries.stream().filter(e -> e.login.equals(login)).filter(e -> e.pass.equals(pass)).map(e -> e.nick).findFirst();
+    }
+
+    //добавление пользователей
+    @Override
+    public boolean createUser(String login, String pass, String nick) throws SQLException {
+        if (login.isEmpty() || pass.isEmpty() || nick.isEmpty()) {
+            System.out.println("The login, password and  nickname cannot be empty");
+            return false;
+        }
+        return createUserSQL(login, pass, nick);
+    }
+
+    private boolean createUserSQL(String login, String pass, String nick) throws SQLException {
+        String createTableSQL = "INSERT INTO " + TABLE_NAME + " (login, pass, nick) VALUES ('" + login + "', '" + pass + "', '" + nick + "')";
+        return statement.execute(createTableSQL);
+    }
+
+
+    //удаление пользователей
+    @Override
+    public boolean deleteUser(String login, String pass) throws SQLException {
+   /*     Optional<Entry> foundUser = selectUser(login, pass);
+        if (!foundUser.isPresent()) {
+            insertUser(login, pass, nick);
+            System.out.println("User <" + nick + "> added successfully");
+
+            foundUser = selectUser(login, pass);
+            if (foundUser.isPresent()) {
+                entries.add(foundUser.get());
+            } else {
+                return false;
+            }
+        } else {
+            System.out.println("User <" + nick + "> is already created");
+            return false;
+        }
+        */
+        return true;
+    }
+
+    public boolean deleteUserSQL(String login, String pass) throws SQLException {
+ /*       Optional<Entry> foundUser = selectUser(login, pass);
+        if (!foundUser.isPresent()) {
+            insertUser(login, pass, nick);
+            System.out.println("User <" + nick + "> added successfully");
+
+            foundUser = selectUser(login, pass);
+            if (foundUser.isPresent()) {
+                entries.add(foundUser.get());
+            } else {
+                return false;
+            }
+        } else {
+            System.out.println("User <" + nick + "> is already created");
+            return false;
+        }
+
+        return true;
+
+        String createTableSQL = "DELETE FROM chatUsers WHERE login = '" + login + "' AND pass = '" + pass + "'";
+        statement.execute(createTableSQL);*/
+        return true;
+    }
 
 }
