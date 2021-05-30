@@ -7,7 +7,7 @@ public interface AuthService {
 
     void start() throws SQLException;
 
-    void stop() throws SQLException;
+    void stop();
 
     boolean createUser(String login, String pass, String nick) throws SQLException;
 
