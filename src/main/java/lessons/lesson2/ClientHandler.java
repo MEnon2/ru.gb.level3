@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +16,15 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String name;
+    private String login;
 
     public String getName() {
         return name;
     }
+    public String getLogin() {
+        return login;
+    }
+
 
     public ClientHandler(MyServer myServer, Socket socket) {
         try {
@@ -27,6 +33,7 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
+            this.login = "";
 
             Thread thread_timeConnect = new Thread(() -> {
                 try {
@@ -47,7 +54,7 @@ public class ClientHandler {
                 try {
                     authentication();
                     readMessages();
-                } catch (IOException e) {
+                } catch (IOException | SQLException e) {
                     e.printStackTrace();
                 } finally {
                     closeConnection();
@@ -74,6 +81,7 @@ public class ClientHandler {
                     if (!myServer.isNickBusy(nick)) {
                         sendMsg(ChatConstants.AUTH_OK + " " + nick);
                         name = nick;
+                        login = parts[1];
                         myServer.subscribe(this);
                         myServer.broadcastMsg(name + " зашел в чат");
                         return;
@@ -87,7 +95,7 @@ public class ClientHandler {
         }
     }
 
-    public void readMessages() throws IOException {
+    public void readMessages() throws IOException, SQLException {
         while (true) {
             String strFromClient = in.readUTF();
             System.out.println("от " + name + ": " + strFromClient);
@@ -118,6 +126,20 @@ public class ClientHandler {
 
                 myServer.sendMsgToClient(this, nickTo, messageToClient);
 
+            } else if (strFromClient.startsWith(ChatConstants.AUTH_CHANGENICK)) {
+                String[] parts = strFromClient.split("\\s");
+                if (parts.length < 2) {
+                    continue;
+                }
+
+                AuthService authService = myServer.getAuthService();
+                if(authService.updateUserInfo(this.getLogin(),"nick", parts[1])) {
+                    sendMsg(ChatConstants.AUTH_CHANGENICK_OK + " " +  parts[1]);
+                    myServer.broadcastMsg(name + " сменил ник на " + parts[1]);
+                    name = parts[1];
+                }
+
+               myServer.broadcastClientsList();
 
             } else {
                 myServer.broadcastMsg(name + ": " + strFromClient);

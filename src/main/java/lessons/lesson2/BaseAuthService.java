@@ -95,12 +95,12 @@ public class BaseAuthService implements AuthService {
     }
 
     //получение пользователя
-    private Optional<Entry> selectUser(String login, String pass)  {
-        return entries.stream().filter(e -> e.login.equals(login)).filter(e -> e.pass.equals(pass)).findFirst();
+    private Optional<Entry> selectUser(String login) {
+        return entries.stream().filter(e -> e.login.equals(login)).findFirst();
     }
 
-    private ResultSet selectUserSQL(String login, String pass) throws SQLException {
-        String QuerySQL = "SELECT * FROM " + TABLE_NAME + " WHERE login = '" + login + "' AND pass = '" + pass + "'";
+    private ResultSet selectUserSQL(String login) throws SQLException {
+        String QuerySQL = "SELECT * FROM " + TABLE_NAME + " WHERE login = '" + login + "'";
         return statement.executeQuery(QuerySQL);
     }
 
@@ -121,7 +121,7 @@ public class BaseAuthService implements AuthService {
             return false;
         }
 
-        if (!selectUser(login, pass).isPresent()) {
+        if (!selectUser(login).isPresent()) {
             if (createUserSQL(login, pass, nick)) {
                 entries.add(new Entry(login, pass, nick));
                 return true;
@@ -138,15 +138,15 @@ public class BaseAuthService implements AuthService {
 
     //удаление пользователей
     @Override
-    public boolean deleteUser(String login, String pass) throws SQLException {
-        if (login.isEmpty() || pass.isEmpty()) {
+    public boolean deleteUser(String login) throws SQLException {
+        if (login.isEmpty()) {
             return false;
         }
 
-        Optional<Entry> foundUser = selectUser(login, pass);
+        Optional<Entry> foundUser = selectUser(login);
 
         if (foundUser.isPresent()) {
-            if (deleteUserSQL(login, pass)) {
+            if (deleteUserSQL(login)) {
                 System.out.println("User <" + login + "> deleted successfully");
 
                 entries.remove(foundUser.get());
@@ -157,30 +157,30 @@ public class BaseAuthService implements AuthService {
         return false;
     }
 
-    public boolean deleteUserSQL(String login, String pass) throws SQLException {
-        String QuerySQL = "DELETE FROM " + TABLE_NAME + " WHERE login = '" + login + "' AND pass = '" + pass + "'";
+    public boolean deleteUserSQL(String login) throws SQLException {
+        String QuerySQL = "DELETE FROM " + TABLE_NAME + " WHERE login = '" + login + "'";
         return statement.execute(QuerySQL);
     }
 
     @Override
-    public boolean updateUserInfo(String login, String pass, String field, String newValue) throws SQLException {
-        if (login.isEmpty() || pass.isEmpty()) {
+    public boolean updateUserInfo(String login, String field, String newValue) throws SQLException {
+        if (login.isEmpty()) {
             return false;
         }
 
-        Optional<Entry> foundUser = selectUser(login, pass);
+        Optional<Entry> foundUser = selectUser(login);
         if (foundUser.isPresent()) {
-            if (updateUserInfoSQL(login, pass, field, newValue)) {
-                System.out.println("User <" + login + "> deleted successfully");
-                foundUser.get().nick = newValue;
-                return true;
-            }
+            updateUserInfoSQL(login, field, newValue);
+            System.out.println("User <" + login + "> deleted successfully");
+            foundUser.get().nick = newValue;
+
+            return true;
         }
         return false;
     }
 
-    public boolean updateUserInfoSQL(String login, String pass, String field, String newValue) throws SQLException {
-        String QuerySQL = "UPDATE " + TABLE_NAME + " SET " + field + " = '" + newValue + "' WHERE login = '" + login + "' AND pass = '" + pass + "'";
+    public boolean updateUserInfoSQL(String login, String field, String newValue) throws SQLException {
+        String QuerySQL = "UPDATE " + TABLE_NAME + " SET " + field + " = '" + newValue + "' WHERE login = '" + login + "'";
         return statement.execute(QuerySQL);
     }
 }

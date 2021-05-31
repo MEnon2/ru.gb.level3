@@ -11,9 +11,9 @@ public interface AuthService {
 
     boolean createUser(String login, String pass, String nick) throws SQLException;
 
-    boolean deleteUser(String login, String pass) throws SQLException;
+    boolean deleteUser(String login) throws SQLException;
 
-    boolean updateUserInfo(String login, String pass, String field, String newValue) throws SQLException;
+    boolean updateUserInfo(String login, String field, String newValue) throws SQLException;
 
     Optional<String> getUserNick(String login, String pass);
 

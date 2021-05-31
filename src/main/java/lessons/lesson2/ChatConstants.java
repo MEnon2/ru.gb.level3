@@ -21,4 +21,9 @@ public class ChatConstants {
 
     public static final String AUTH_TIMEOUT = "/timeout";
 
+    public static final String AUTH_CHANGENICK = "/changenick";
+
+    public static final String AUTH_CHANGENICK_OK = "/changenick";
+
+
 }

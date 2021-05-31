@@ -93,6 +93,14 @@ public class ClientChat extends Application {
                             }
                             btnAuth.setText(ChatConstants.EXIT_TEXT);
                         });
+                    } else if (str.startsWith(ChatConstants.AUTH_CHANGENICK_OK)) {
+                        Platform.runLater(() -> {
+                            String[] parts = str.split("\\s");
+                            if (parts.length > 1) {
+                                labelNick.setText(parts[1]);
+                            }
+
+                        });
                     } else {
                         if (mainChat != null) {
                             mainChat.appendText(str + "\n");
