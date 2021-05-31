@@ -42,7 +42,7 @@ public class ClientHandler {
                     e.printStackTrace();
                 }
 
-                if (getName().isEmpty()) {
+                if (this.getName().isEmpty()) {
                     sendMsg(ChatConstants.AUTH_TIMEOUT);
                     System.out.println("AUTH_TIMEOUT");
                     closeConnection();
@@ -84,6 +84,7 @@ public class ClientHandler {
                         login = parts[1];
                         myServer.subscribe(this);
                         myServer.broadcastMsg(name + " зашел в чат");
+                        System.out.println(name + " зашел в чат");
                         return;
                     } else {
                         sendMsg("Учетная запись уже используется");

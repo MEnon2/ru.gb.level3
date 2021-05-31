@@ -14,6 +14,9 @@ public class BaseAuthService implements AuthService {
 
     private List<Entry> entries = new ArrayList<>();
 
+   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    Перенести всё в старт и избавиться от статиков
+
     static {
         try {
 
