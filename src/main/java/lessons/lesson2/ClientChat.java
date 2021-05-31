@@ -53,7 +53,7 @@ public class ClientChat extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("resources/chat_structure.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("chat_structure.fxml"));
         primaryStage.setTitle("Сетевой чат на курсе GeekBrains");
         primaryStage.setScene(new Scene(root, 1000, 600));
         primaryStage.show();
