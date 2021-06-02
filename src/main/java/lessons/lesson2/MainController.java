@@ -11,7 +11,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class MainController {
-    ServerHandler serverHandler;
+    private ServerHandler serverHandler;
+
+    public ServerHandler getServerHandler() {
+        return serverHandler;
+    }
+
     @FXML
     public TextField messageField;
 
@@ -52,7 +57,8 @@ public class MainController {
                 labelNick.setText("");
                 btnAuth.setText(ChatConstants.AUTH_TEXT);
             });
-            //closeConnection();
+
+            serverHandler.closeConnection();
 
             Stage stage = (Stage) btnAuth.getScene().getWindow();
             stage.close();
@@ -60,10 +66,7 @@ public class MainController {
 
         } else {
             serverHandler.sendMessageToServer(ChatConstants.AUTH_COMMAND + " " + loginField.getText() + " " + passField.getText());
-            Platform.runLater(() -> {
-                loginField.clear();
-                passField.clear();
-            });
+
         }
     }
 
