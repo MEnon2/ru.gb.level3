@@ -39,11 +39,9 @@ public class ServerHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    saveChatHistory();
                     closeConnection();
                 }
             }).start();
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +76,7 @@ public class ServerHandler {
 
                 } else if (str.startsWith(ChatConstants.AUTH_TIMEOUT)) {
                     Platform.runLater(() -> {
-                        mctrl.mainChat.appendText("Вышло время для авторизации." + "\n");
+                        mctrl.sendTextToMainChat("Вышло время для авторизации.");
                         mctrl.loginField.setEditable(false);
                         mctrl.passField.setEditable(false);
                         mctrl.btnAuth.setDisable(true);
@@ -111,8 +109,8 @@ public class ServerHandler {
                     });
                 } else {
                     Platform.runLater(() -> {
-                        mctrl.mainChat.appendText(str + "\n");
-
+                        mctrl.sendTextToMainChat(str);
+                        saveChatHistory(str + "\n");
                     });
                 }
             }
@@ -122,13 +120,13 @@ public class ServerHandler {
         }
     }
 
-    public boolean saveChatHistory() {
+    public boolean saveChatHistory(String text) {
         if (!nick.isEmpty()) {
 
             File fileHistory = new File(login + "_chat_history.txt");
 
-            try (OutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileHistory, false))) {
-                bufferedOutputStream.write(mctrl.mainChat.getText().getBytes("UTF-8"));
+            try (OutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileHistory, true))) {
+                bufferedOutputStream.write(text.getBytes("UTF-8"));
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -168,7 +166,7 @@ public class ServerHandler {
                     .limit(countStringChat > parts.length ? parts.length : countStringChat)
                     .collect(Collectors.joining("\n"));
 
-            mctrl.mainChat.setText(historyToChatString + "\n");
+            mctrl.sendTextToMainChat(historyToChatString);
             return true;
         } catch (IOException e) {
             e.printStackTrace();

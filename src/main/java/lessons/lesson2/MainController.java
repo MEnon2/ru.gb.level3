@@ -84,4 +84,12 @@ public class MainController {
 
         messageField.setText(ChatConstants.SEND_TO_LIST + " /" + userList.getSelectionModel().getSelectedItem() + " " + messageText);
     }
+
+    public void sendTextToMainChat(String text) {
+        Platform.runLater(() -> mainChat.appendText(text + "\n"));
+    }
+
+    public String getTextMainChat() {
+        return mainChat.getText();
+    }
 }
