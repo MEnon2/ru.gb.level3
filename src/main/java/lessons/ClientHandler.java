@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ClientHandler {
@@ -35,7 +38,8 @@ public class ClientHandler {
             this.name = "";
             this.login = "";
 
-            //А что если сделать их daemon ? один закончился, вырубятся и остальные?
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
+
             Thread thread_timeConnect = new Thread(() -> {
                 try {
                     //добавить сюда проверку через while, т.к. может произойти файнтомное пробуждение
@@ -53,6 +57,7 @@ public class ClientHandler {
             });
             thread_timeConnect.start();
 
+            //А что если сделать их daemon ? один закончился, вырубятся и остальные?
             new Thread(() -> {
                 try {
                     authentication();
