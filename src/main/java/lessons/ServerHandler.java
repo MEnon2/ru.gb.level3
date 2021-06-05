@@ -1,4 +1,4 @@
-package lessons.lesson2;
+package lessons;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -33,6 +33,7 @@ public class ServerHandler {
             this.nick = "";
             this.login = "";
 
+            //А что если сделать их daemon ? один закончился, вырубятся и остальные?
             new Thread(() -> {
                 try {
                     readMessagesFromServer();

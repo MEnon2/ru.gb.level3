@@ -1,4 +1,4 @@
-package lessons.lesson2;
+package lessons;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -35,8 +35,11 @@ public class ClientHandler {
             this.name = "";
             this.login = "";
 
+            //А что если сделать их daemon ? один закончился, вырубятся и остальные?
             Thread thread_timeConnect = new Thread(() -> {
                 try {
+                    //добавить сюда проверку через while, т.к. может произойти файнтомное пробуждение
+//                    подумать как сделать его демоном
                     Thread.sleep(120000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

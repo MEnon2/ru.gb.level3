@@ -1,4 +1,4 @@
-package lessons.lesson2;
+package lessons;
 
 public class ServerApp {
     public static void main(String[] args) {

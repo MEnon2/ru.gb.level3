@@ -1,4 +1,4 @@
-package lessons.lesson2;
+package lessons;
 
 public class ChatConstants {
     public static final String HOST = "localhost";
