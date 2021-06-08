@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lessons.MainController">
+    <top>
+        <FlowPane alignment="BOTTOM_RIGHT" columnHalignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+            <children>
+                <HBox prefHeight="27.0" prefWidth="677.0">
+                    <children>
+                        <Label prefHeight="17.0" prefWidth="414.0">
+                            <BorderPane.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </BorderPane.margin>
+                            Новый крутой чат! Telegram отдыхает ))))
+                        </Label>
+                        <Label fx:id="labelNick" prefHeight="17.0" prefWidth="125.0" textAlignment="CENTER" textFill="#0606dd">
+                            <BorderPane.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </BorderPane.margin>
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="loginField" maxWidth="100.0" minWidth="50" prefHeight="25.0" prefWidth="100.0" />
+                        <TextField fx:id="passField" maxWidth="100.0" minWidth="50" prefHeight="25.0" prefWidth="100.0" />
+                        <Button fx:id="btnAuth" maxWidth="450" minWidth="50" onAction="#btnClickAuth" prefWidth="100" text="Auth" />
+                    </children>
+                </HBox>
+            </children>
+        </FlowPane>
+    </top>
+
+    <left>
+    </left>
+
+    <right>
+        <StackPane>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+            <children>
+
+                <ListView fx:id="userList" onMouseClicked="#userListClicked" prefHeight="200.0" prefWidth="200.0" />
+            </children>
+        </StackPane>
+    </right>
+
+    <center>
+        <StackPane>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+            <children>
+                <TextArea fx:id="mainChat" editable="false" AnchorPane.leftAnchor="1" AnchorPane.topAnchor="1" />
+            </children>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <FlowPane alignment="BOTTOM_RIGHT" columnHalignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+            <children>
+                <HBox prefHeight="27.0" prefWidth="677.0">
+                    <children>
+                        <TextField fx:id="messageField" maxWidth="800" minWidth="200" onKeyPressed="#messageFieldPress" prefHeight="25.0" prefWidth="609.0" />
+                        <Button fx:id="btnSend" maxWidth="450" minWidth="50" onAction="#btnClickSend" onKeyPressed="#messageFieldPress" prefWidth="100" text="Send" />
+                    </children>
+                </HBox>
+            </children>
+        </FlowPane>
+    </bottom>
+
+</BorderPane>
