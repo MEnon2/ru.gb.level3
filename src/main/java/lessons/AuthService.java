@@ -5,15 +5,15 @@ import java.util.Optional;
 
 public interface AuthService {
 
-    void start() throws SQLException;
+    void start();
 
     void stop();
 
-    boolean createUser(String login, String pass, String nick) throws SQLException;
+    boolean createUser(String login, String pass, String nick);
 
-    boolean deleteUser(String login) throws SQLException;
+    boolean deleteUser(String login);
 
-    boolean updateUserInfo(String login, String field, String newValue) throws SQLException;
+    boolean updateUserInfo(String login, String field, String newValue);
 
     Optional<String> getUserNick(String login, String pass);
 

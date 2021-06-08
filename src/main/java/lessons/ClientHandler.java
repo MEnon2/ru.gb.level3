@@ -24,10 +24,10 @@ public class ClientHandler {
     public String getName() {
         return name;
     }
+
     public String getLogin() {
         return login;
     }
-
 
     public ClientHandler(MyServer myServer, Socket socket) {
         try {
@@ -38,27 +38,33 @@ public class ClientHandler {
             this.name = "";
             this.login = "";
 
-            ExecutorService executorService = Executors.newFixedThreadPool(2);
+            ExecutorService timeConnectES = Executors.newSingleThreadExecutor();
+            ExecutorService readMessageES = Executors.newSingleThreadExecutor();
 
-            Thread thread_timeConnect = new Thread(() -> {
-                try {
-                    //добавить сюда проверку через while, т.к. может произойти файнтомное пробуждение
-//                    подумать как сделать его демоном
-                    Thread.sleep(120000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            timeConnectES.execute(() -> {
+                long endTime = System.currentTimeMillis() + 2 * 60 * 1000;
+                System.out.println("Start of waiting authentification (2 minutes)");
+                while (System.currentTimeMillis() < endTime) {
+                    try {
+                        Thread.sleep(5 * 1000);
+                        if (!this.getName().isEmpty()) {
+                            System.out.println("Authentification completed successfully");
+                            return;
+                        }
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-
                 if (this.getName().isEmpty()) {
                     sendMsg(ChatConstants.AUTH_TIMEOUT);
                     System.out.println("AUTH_TIMEOUT");
                     closeConnection();
                 }
             });
-            thread_timeConnect.start();
+            timeConnectES.shutdown();
 
-            //А что если сделать их daemon ? один закончился, вырубятся и остальные?
-            new Thread(() -> {
+            readMessageES.execute(() -> {
                 try {
                     authentication();
                     readMessages();
@@ -67,7 +73,9 @@ public class ClientHandler {
                 } finally {
                     closeConnection();
                 }
-            }).start();
+            });
+            readMessageES.shutdown();
+
         } catch (IOException e) {
             throw new RuntimeException("Проблемы при создании обработчика клиента");
         }
@@ -142,13 +150,13 @@ public class ClientHandler {
                 }
 
                 AuthService authService = myServer.getAuthService();
-                if(authService.updateUserInfo(this.getLogin(),"nick", parts[1])) {
-                    sendMsg(ChatConstants.AUTH_CHANGENICK_OK + " " +  parts[1]);
+                if (authService.updateUserInfo(this.getLogin(), "nick", parts[1])) {
+                    sendMsg(ChatConstants.AUTH_CHANGENICK_OK + " " + parts[1]);
                     myServer.broadcastMsg(name + " сменил ник на " + parts[1]);
                     name = parts[1];
                 }
 
-               myServer.broadcastClientsList();
+                myServer.broadcastClientsList();
 
             } else {
                 myServer.broadcastMsg(name + ": " + strFromClient);
@@ -169,6 +177,7 @@ public class ClientHandler {
     public void closeConnection() {
         myServer.unsubscribe(this);
         myServer.broadcastMsg(name + " вышел из чата");
+
         try {
             in.close();
         } catch (IOException e) {

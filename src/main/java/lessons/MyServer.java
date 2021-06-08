@@ -20,8 +20,8 @@ public class MyServer {
 
     public MyServer() {
         try (ServerSocket serverSocket = new ServerSocket(ChatConstants.PORT)) {
-            System.out.println("Сервер запущен");
-            authService = new BaseAuthService();
+            System.out.println("Server is running");
+            authService = new DbAuthService();
             authService.start();
 
             clients = new ArrayList<>();
@@ -31,7 +31,8 @@ public class MyServer {
                 System.out.println("Соединение с клиентом установленно");
                 new ClientHandler(this, socket);
             }
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Ошибка в работе сервера");
         } finally {
             if (authService != null) {
