@@ -1,13 +1,16 @@
 package lessons.lesson4;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class LessonApp {
 
-    private final Object mon = new Object();
-    private volatile char firstLetter = 'A';
-    private final char[] letters = {'A', 'B', 'C'};
-    private final int numberRepetitions = 5;
+    private static final Object mon = new Object();
+    private static volatile char firstLetter = 'A';
+    private static final char[] letters = {'A', 'B', 'C'};
+    private static final int numberRepetitions = 5;
 
-    public void printLittera(int position) {
+    public static void printLittera(int position) {
         synchronized (mon) {
 
             for (int i = 0; i < numberRepetitions; i++) {
@@ -28,15 +31,12 @@ public class LessonApp {
 
 
     public static void main(String[] args) {
-        LessonApp app = new LessonApp();
 
-        Thread t1 = new Thread(() -> app.printLittera(0));
-        Thread t2 = new Thread(() -> app.printLittera(1));
-        Thread t3 = new Thread(() -> app.printLittera(2));
-
-        t1.start();
-        t2.start();
-        t3.start();
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        executorService.execute(() -> printLittera(0));
+        executorService.execute(() -> printLittera(1));
+        executorService.execute(() -> printLittera(2));
+        executorService.shutdown();
 
     }
 }
